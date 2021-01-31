@@ -9,20 +9,14 @@
 
 //------------------------------------------------------------------------------------
 VectorField::VectorField(){
-    
-    
-    
-    /*fieldWidth  = 60;
-     fieldHeight = 40;
-     */
 }
 
 //------------------------------------------------------------------------------------
 void VectorField::setupField(int innerW, int innerH, int outerW, int outerH){
     
     fieldWidth            = innerW;
-    fieldHeight            = innerH;
-    externalWidth        = outerW;
+    fieldHeight           = innerH;
+    externalWidth         = outerW;
     externalHeight        = outerH;
     
     field.clear();
