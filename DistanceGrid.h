@@ -68,7 +68,7 @@ public:
     //returns true if pnt is far enoug away
     bool is_pnt_far_enough_from_others(ofVec2f p, float check_dist){
         if (check_dist > d_sep){
-            cout<<"CHECK DIST CANNOT BE GREATER THAN D_SEP!"<<endl;
+            cout<<"CHECK DIST SHOULD NOT BE GREATER THAN D_SEP!"<<endl;
         }
         
         //get the cell for this location
