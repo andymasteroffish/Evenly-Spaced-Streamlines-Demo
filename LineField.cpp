@@ -25,7 +25,7 @@ void LineField::setup(){
     
     
     //setup the field
-    bool make_topo_shape = false;    //just toggling demo fields
+    bool make_topo_shape = true;    //just toggling demo fields
     for (int i=0; i<30; i++){
         float effect_size = field_size * 0.3;
         float effect_strength = 6;
@@ -125,7 +125,7 @@ StreamLine LineField::create_stream_line(ofVec2f origin){
     grow_line(origin, 1, &line, 0);
     grow_line(origin, -1, &line, 0);
     
-    cout<<"new line size: "<<line.pnts.size()<<endl;
+    //cout<<"new line size: "<<line.pnts.size()<<endl;
     
     return line;
 }

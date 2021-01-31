@@ -22,55 +22,60 @@ void VectorField::setupField(int innerW, int innerH, int outerW, int outerH){
     field.clear();
     
     fieldSize = fieldWidth * fieldHeight;
-    for (int i = 0; i < fieldSize; i++){
-        ofVec2f pt;
-        pt.set(0,0);
-        
-        
-        
-        field.push_back(pt);
+    for (int c=0; c<fieldWidth; c++){
+        vector<ofVec2f> col;
+        for (int r=0; r<fieldHeight; r++){
+            col.push_back( ofVec2f(0,0));
+        }
+        field.push_back(col);
     }
     
     
-    //testing
-    for (int i = 0; i < fieldWidth; i++){
-        for (int j = 0; j < fieldHeight; j++){
-            
-            // pos in array
-            int pos = j * fieldWidth + i;
-            
-            //test angle
-            float angle = ofNoise(i*0.03, j*0.01);
-            field[pos].x = cos(angle);
-            field[pos].y = sin(angle);
-            
+//    //testing
+//    for (int i = 0; i < fieldWidth; i++){
+//        for (int j = 0; j < fieldHeight; j++){
+//
+//            // pos in array
+//            int pos = j * fieldWidth + i;
+//
+//            //test angle
+//            float angle = ofNoise(i*0.03, j*0.01);
+//            field[pos].x = cos(angle);
+//            field[pos].y = sin(angle);
+//
+//        }
+//    }
+}
+
+
+//------------------------------------------------------------------------------------
+void VectorField::clear(){
+    for (int c=0; c<fieldWidth; c++){
+        for (int r=0; r<fieldHeight; r++){
+            field[c][r].set(0,0);
         }
     }
 }
 
 
 //------------------------------------------------------------------------------------
-void VectorField::clear(){
-    for (int i = 0; i < fieldSize; i++){
-        field[i].set(0,0);
-    }
-}
-
-
-//------------------------------------------------------------------------------------
 void VectorField::fadeField(float fadeAmount){
-    for (int i = 0; i < fieldSize; i++){
-        field[i].set(field[i].x*fadeAmount,field[i].y*fadeAmount);
+    for (int c=0; c<fieldWidth; c++){
+        for (int r=0; r<fieldHeight; r++){
+            field[c][r].set(field[c][r].x*fadeAmount,field[c][r].y*fadeAmount);
+        }
     }
 }
 
 //------------------------------------------------------------------------------------
 void VectorField::randomizeField(float scale){
-    for (int i = 0; i < fieldSize; i++){
-        // random between -1 and 1
-        float x = (float)(ofRandom(-1,1)) * scale;
-        float y = (float)(ofRandom(-1,1)) * scale;
-        field[i].set(x,y);
+    for (int c=0; c<fieldWidth; c++){
+        for (int r=0; r<fieldHeight; r++){
+            // random between -1 and 1
+            float x = (float)(ofRandom(-1,1)) * scale;
+            float y = (float)(ofRandom(-1,1)) * scale;
+            field[c][r].set(x,y);
+        }
     }
 }
 
@@ -83,13 +88,11 @@ void VectorField::draw(){
     for (int i = 0; i < fieldWidth; i++){
         for (int j = 0; j < fieldHeight; j++){
             
-            // pos in array
-            int pos = j * fieldWidth + i;
             // pos externally
             float px =     i * scalex;
             float py =     j * scaley;
-            float px2 = px + field[pos].x * 2;
-            float py2 = py + field[pos].y * 2;
+            float px2 = px + field[i][j].x * 2;
+            float py2 = py + field[i][j].y * 2;
             
             ofLine(px,py, px2, py2);
             
@@ -117,14 +120,11 @@ vector<GLine> VectorField::get_lines(){
     
     for (int i = 0; i < fieldWidth; i++){
         for (int j = 0; j < fieldHeight; j++){
-            
-            // pos in array
-            int pos = j * fieldWidth + i;
             // pos externally
             float px =     i * scalex;
             float py =     j * scaley;
-            float px2 = px + field[pos].x * 4;
-            float py2 = py + field[pos].y * 4;
+            float px2 = px + field[i][j].x * 4;
+            float py2 = py + field[i][j].y * 4;
             
             GLine line = GLine(px,py, px2, py2);
             lines.push_back(line);
@@ -161,9 +161,9 @@ ofVec2f VectorField::getForceFromPos(float xpos, float ypos){
     fieldPosY = MAX(0, MIN(fieldPosY, fieldHeight-1));
     
     // pos in array
-    int pos = fieldPosY * fieldWidth + fieldPosX;
+    //int pos = fieldPosY * fieldWidth + fieldPosX;
     
-    frc.set(field[pos].x * 0.1, field[pos].y * 0.1 );  // scale here as values are pretty large.
+    frc.set(field[fieldPosX][fieldPosY].x * 0.1, field[fieldPosX][fieldPosY].y * 0.1 );  // scale here as values are pretty large.
     return frc;
 }
 
@@ -199,7 +199,7 @@ void VectorField::addInwardCircle(float x, float y, float radius, float strength
     for (int i = startx; i < endx; i++){
         for (int j = starty; j < endy; j++){
             
-            int pos = j * fieldWidth + i;
+            //int pos = j * fieldWidth + i;
             float distance = (float)sqrt((fieldPosX-i)*(fieldPosX-i) +
                                          (fieldPosY-j)*(fieldPosY-j));
             
@@ -212,8 +212,8 @@ void VectorField::addInwardCircle(float x, float y, float radius, float strength
                 float strongness = strength * pct;
                 float unit_px = ( fieldPosX - i) / distance;
                 float unit_py = ( fieldPosY - j) / distance;
-                field[pos].x += unit_px * strongness;
-                field[pos].y += unit_py * strongness;
+                field[i][j].x += unit_px * strongness;
+                field[i][j].y += unit_py * strongness;
             }
         }
     }
@@ -253,7 +253,6 @@ void VectorField::addOutwardCircle(float x, float y, float radius, float strengt
     for (int i = startx; i < endx; i++){
         for (int j = starty; j < endy; j++){
             
-            int pos = j * fieldWidth + i;
             float distance = (float)sqrt((fieldPosX-i)*(fieldPosX-i) +
                                          (fieldPosY-j)*(fieldPosY-j));
             
@@ -268,8 +267,8 @@ void VectorField::addOutwardCircle(float x, float y, float radius, float strengt
                 
                 //printf(" overall length = %f \n", sqrt(unit_px* unit_px + unit_py* unit_py));
                 
-                field[pos].x -= unit_px * strongness;
-                field[pos].y -= unit_py * strongness;
+                field[i][j].x -= unit_px * strongness;
+                field[i][j].y -= unit_py * strongness;
             }
         }
     }
@@ -309,7 +308,6 @@ void VectorField::addClockwiseCircle(float x, float y, float radius, float stren
     for (int i = startx; i < endx; i++){
         for (int j = starty; j < endy; j++){
             
-            int pos = j * fieldWidth + i;
             float distance = (float)sqrt((fieldPosX-i)*(fieldPosX-i) +
                                          (fieldPosY-j)*(fieldPosY-j));
             
@@ -322,8 +320,8 @@ void VectorField::addClockwiseCircle(float x, float y, float radius, float stren
                 float strongness = strength * pct;
                 float unit_px = ( fieldPosX - i) / distance;
                 float unit_py = ( fieldPosY - j) / distance;
-                field[pos].x += unit_py * strongness;   /// Note: px and py switched, for perpendicular
-                field[pos].y -= unit_px * strongness;
+                field[i][j].x += unit_py * strongness;   /// Note: px and py switched, for perpendicular
+                field[i][j].y -= unit_px * strongness;
             }
         }
     }
@@ -365,7 +363,7 @@ void VectorField::addCounterClockwiseCircle(float x, float y, float radius, floa
     for (int i = startx; i < endx; i++){
         for (int j = starty; j < endy; j++){
             
-            int pos = j * fieldWidth + i;
+            //int pos = j * fieldWidth + i;
             float distance = (float)sqrt((fieldPosX-i)*(fieldPosX-i) +
                                          (fieldPosY-j)*(fieldPosY-j));
             
@@ -378,8 +376,8 @@ void VectorField::addCounterClockwiseCircle(float x, float y, float radius, floa
                 float strongness = strength * pct;
                 float unit_px = ( fieldPosX - i) / distance;
                 float unit_py = ( fieldPosY - j) / distance;
-                field[pos].x -= unit_py * strongness;   /// Note: px and py switched, for perpendicular
-                field[pos].y += unit_px * strongness;
+                field[i][j].x -= unit_py * strongness;   /// Note: px and py switched, for perpendicular
+                field[i][j].y += unit_px * strongness;
             }
         }
     }
@@ -420,7 +418,7 @@ void VectorField::addVectorCircle(float x, float y, float vx, float vy, float ra
     for (int i = startx; i < endx; i++){
         for (int j = starty; j < endy; j++){
             
-            int pos = j * fieldWidth + i;
+            //int pos = j * fieldWidth + i;
             float distance = (float)sqrt((fieldPosX-i)*(fieldPosX-i) +
                                          (fieldPosY-j)*(fieldPosY-j));
             
@@ -430,8 +428,8 @@ void VectorField::addVectorCircle(float x, float y, float vx, float vy, float ra
                 
                 float pct = 1.0f - (distance / fieldRadius);
                 float strongness = strength * pct;
-                field[pos].x += vx * strongness;
-                field[pos].y += vy * strongness;
+                field[i][j].x += vx * strongness;
+                field[i][j].y += vy * strongness;
             }
         }
     }
@@ -455,7 +453,7 @@ void VectorField::set_outter_oval(float center_x, float center_y, float width, f
     //go through the whole field
     for (int x=0; x<fieldWidth; x++){
         for (int y=0; y<fieldHeight; y++){
-            int pos = y * fieldWidth + x;
+            //int pos = y * fieldWidth + x;
             
             //https://www.geeksforgeeks.org/check-if-a-point-is-inside-outside-or-on-the-ellipse/
             float p = (powf((x - fieldPosX), 2) / powf(field_dist_x, 2))
@@ -466,7 +464,7 @@ void VectorField::set_outter_oval(float center_x, float center_y, float width, f
                 ofVec2f dir = ofVec2f(fieldPosX,fieldPosY) - ofVec2f(x,y);
                 dir.normalize();
                 
-                field[pos] = dir * strength;
+                field[x][y] = dir * strength;
             }
         }
     }
@@ -488,11 +486,11 @@ void VectorField::point_unused_to_point(float center_x, float center_y, float st
         for (int y=0; y<fieldHeight; y++){
             int pos = y * fieldWidth + x;
             
-            if (field[pos].length() < 0.01){
+            if (field[x][y].length() < 0.01){
                 ofVec2f dir = ofVec2f(fieldPosX,fieldPosY) - ofVec2f(x,y);
                 dir.normalize();
                 
-                field[pos] = dir * strength;
+                field[x][y] = dir * strength;
             }
             
         }

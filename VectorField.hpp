@@ -24,7 +24,7 @@ public:
     int externalWidth;
     int externalHeight;
     
-    vector <ofVec2f> field;
+    vector <vector<ofVec2f>> field;
     
     VectorField();
     virtual ~VectorField();
