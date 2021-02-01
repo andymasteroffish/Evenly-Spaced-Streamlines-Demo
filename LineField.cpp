@@ -14,7 +14,7 @@ void LineField::setup(){
     d_sep = 3.0;            //how far a line origin must be from any other points
     d_test = d_sep * 0.4;   //how far a line point can get to other points while drawing
     
-    max_steps_without_moving = 10;  //the the line is caught in one place, kill it. This is duct-tape
+    max_steps_without_moving = 30;  //the the line is caught in one place, kill it. This is duct-tape
     
     
     int field_size = ofGetWidth();
@@ -24,12 +24,12 @@ void LineField::setup(){
     
     //setup the vector field
     field.setupField(field_size/5, field_size/5, field_size, field_size);
-    field.randomizeField(1.5);
+    field.randomizeField(0.5);
     
-    bool make_topo_shape = false;    //just toggling demo fields
+    bool make_topo_shape = true;    //just toggling demo fields
     for (int i=0; i<30; i++){
         float effect_size = field_size * 0.3;
-        float effect_strength = 6;
+        float effect_strength = 2;
         if (make_topo_shape){
             field.addClockwiseCircle(ofRandom(ofGetWidth()), ofRandom(ofGetHeight()), effect_size, effect_strength);
             field.addCounterClockwiseCircle(ofRandom(ofGetWidth()), ofRandom(ofGetHeight()), effect_size, effect_strength);
